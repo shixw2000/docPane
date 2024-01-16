@@ -262,13 +262,10 @@ public class Segment implements Element {
 	
 	private ListRoot<SegmentLine> getDefLine(DocView doc) {
 		ListRoot<SegmentLine> lines = new ListRoot<SegmentLine>();
-		SegmentLine line = new SegmentLine(this, 0);
+		SegmentLine line = new SegmentLine(doc, this, 0);
 		int font = m_defs[EnumAttr.ATTR_FONT.ordinal()];
-		FontMetrics fm = doc.getFM(font);
-		int h = fm.getHeight();
-		int baseY = fm.getAscent();
 		
-		line.setH(h, baseY);
+		line.setH(doc, font);
 		lines.push_back(line);
 		return lines;
 	}

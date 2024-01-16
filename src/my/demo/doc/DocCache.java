@@ -185,24 +185,36 @@ class ImageSlice extends MetaSlice {
 	private String m_path;
 	private int m_w;
 	private int m_h;
+	private int m_imgW;
+	private int m_imgH;
 	
-	ImageSlice(String path) {
+	private ImageSlice(String path) {
 		m_path = path;
-		
-		loadImg(path);
 	}
 	
-	private void loadImg(String path) {
+	public static ImageSlice loadImg(DocView doc, String path) {
+		ImageSlice slice = new ImageSlice(path);
+		
 		try (InputStream in = new FileInputStream(path)) {
-			m_img = ImageIO.read(in);
+			Image img = ImageIO.read(in); 
 			
-			if (null != m_img) {
-				m_w = m_img.getWidth(null);
-				m_h = m_img.getHeight(null);
+			if (null != img) {
+				int maxW = doc.maxW();
+				int maxH = doc.pageH() / 3;
+				int w = img.getWidth(null);
+				int h = img.getHeight(null);
+				
+				slice.m_img = img;
+				slice.m_imgW = w;
+				slice.m_imgH = h;
+				
+				slice.adjustDim(maxW, maxH);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return slice;
 	}
 	
 	public String path() {
@@ -239,6 +251,20 @@ class ImageSlice extends MetaSlice {
 			}
 		} else {
 			System.out.println(">>> invalid image cb range!!");
+		}
+	}
+	
+	private void adjustDim(int w, int h) {
+		if (w < m_imgW || h < m_imgH) {
+			float ratioW = (float)m_imgW / w;
+			float ratioH = (float)m_imgH / h;
+			float ratio = ratioW > ratioH ? ratioW : ratioH;
+			
+			m_w = (int)(m_imgW / ratio);
+			m_h = (int)(m_imgH / ratio);
+		} else {
+			m_w = m_imgW;
+			m_h = m_imgH;
 		}
 	}
 	
@@ -413,8 +439,8 @@ public class DocCache {
 		return ts;
 	}
 	
-	public ImageSlice creatImage(String path) {
-		ImageSlice is = new ImageSlice(path);
+	public ImageSlice creatImage(DocView doc, String path) {
+		ImageSlice is = ImageSlice.loadImg(doc, path);
 		
 		return is;
 	}

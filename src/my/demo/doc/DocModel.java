@@ -537,7 +537,7 @@ class DocModel {
 	}
 	
 	public void handleImage(String path) {
-		Slice s = m_cache.creatImage(path);
+		Slice s = m_cache.creatImage(m_doc, path);
 		
 		addSlice(s);
 	}

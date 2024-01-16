@@ -264,7 +264,7 @@ public class DocSegment {
 		int w = 0;
 
 		lines = new ListRoot<SegmentLine>();
-		line = new SegmentLine(segment, col);
+		line = new SegmentLine(doc, segment, col);
 		lines.push_back(line);
 		
 		w = maxW;
@@ -286,7 +286,7 @@ public class DocSegment {
 					w -= leftW;
 					break;
 				} else if (1 == len) {
-					line = new SegmentLine(segment, col);
+					line = new SegmentLine(doc, segment, col);
 					lines.push_back(line);
 					w = maxW;
 					
@@ -314,7 +314,7 @@ public class DocSegment {
 					}
 					
 					if (0 < len) {
-						line = new SegmentLine(segment, col);
+						line = new SegmentLine(doc, segment, col);
 						lines.push_back(line);
 						w = maxW;
 					}

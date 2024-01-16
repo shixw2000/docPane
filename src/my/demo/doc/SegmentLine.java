@@ -208,11 +208,13 @@ public class SegmentLine implements Element {
 	private int m_cnt;
 	private ListRoot<ViewEx> m_views;
 	
-	SegmentLine(Segment parent, int begCol) {
+	SegmentLine(DocView doc, Segment parent, int begCol) {
 		m_parent = parent;
 		m_begCol = begCol;
 		
 		m_views = new ListRoot<ViewEx>();
+		
+		setH(doc, DocFormat.DEF_ID_VAL);
 	}
 	
 	void setPageRow(int pageNo, int pageLine, int line, int row) {
@@ -243,10 +245,22 @@ public class SegmentLine implements Element {
 		} 
 	}
 	
-	void setH(int h, int baseY) {
-		m_h = h;
-		m_textH = h;
-		m_baseY = baseY;
+	void setH(DocView doc, int font) {
+		FontMetrics fm = doc.getFM(font);
+		int h = fm.getHeight();
+		int baseY = fm.getAscent();
+		
+		if (m_h < h) {
+			m_h = h;
+		}
+		
+		if (m_textH < h) {
+			m_textH = h;
+		}
+		
+		if (m_baseY < baseY) {
+			m_baseY = baseY;
+		}
 	}
 	
 	public int length() {
