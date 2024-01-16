@@ -133,7 +133,6 @@ class DimenCb extends ValidCacheCb {
 	DocView m_doc;
 	int m_retW;
 	int m_retH;
-	int m_imgH;
 	int m_retBaseY;
 	
 	DimenCb(DocView doc) {
@@ -142,7 +141,7 @@ class DimenCb extends ValidCacheCb {
 	
 	public void reset() {
 		super.reset();
-		m_imgH = m_retW = m_retH = m_retBaseY = 0;
+		m_retW = m_retH = m_retBaseY = 0;
 	}
 }
 
@@ -186,8 +185,9 @@ class FillLineCb extends ValidCacheCb {
 	Graphics m_g;
 	int m_x;
 	int m_y;
-	int m_textH;
 	int m_h;
+	int m_textH;
+	int m_baseY;
 	int m_retW;
 	
 	FillLineCb(DocView doc, Graphics g) {

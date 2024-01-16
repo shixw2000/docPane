@@ -298,6 +298,7 @@ public class DocPage {
 				flc.m_x = w; 
 				flc.m_h = segline.h();
 				flc.m_textH = segline.textH();
+				flc.m_baseY = segline.baseY();
 				segline.fill(beg, end, wc, flc);
 				
 				flc.m_y += segline.h();
@@ -368,45 +369,6 @@ public class DocPage {
 		s2.set(line2, segline.length());
 		
 		DocSegment.select(m_lines, s1, s2, cb); 
-	}
-	
-	public void renderStatus(DocView doc, Graphics g, int w, int h,
-			PageState pageStat, PosInfo posInfo, int[] attrs) {
-		int page = pageStat.pageNo();
-		int line = pageStat.pageLine();
-		int pos = posInfo.pos();
-		int font = attrs[EnumAttr.ATTR_FONT.ordinal()];
-		int foreClr = attrs[EnumAttr.ATTR_FORE_COLOR.ordinal()];
-		int backClr = attrs[EnumAttr.ATTR_BACK_COLOR.ordinal()];
-		int statusFont = doc.statusFont();
-		int statusColor = doc.statusColor();
-		FontMetrics statusFm = doc.getFM(statusFont);
-		int maxH = doc.pageH();
-		int x = 0;
-		int y = maxH;
-		int baseY = doc.statusBaseY();
-		
-		doc.setFont(g, statusFont);
-		doc.setBackColor(g, backClr);
-		doc.clearRect(g, x, y, w, h);
-		
-		doc.setForeColor(g, foreClr);
-		doc.fillArc(g, x, y, w, h, -90, 180); 
-		
-		doc.setForeColor(g, statusColor);
-		doc.drawLine(g, w, 0, w, doc.height());
-		doc.drawLine(g, 0, y, doc.width(), y);
-		x += w * 2;
-		
-		String info = "page: " + Integer.toString(page) 
-			+ ", line: " + Integer.toString(line) 
-			+ ", col: " + Integer.toString(pos);
-
-		doc.drawString(g, x, y, baseY, info); 
-		x += statusFm.stringWidth(info) + w;
-		
-		FontItem fontItem = doc.fontItem(font);
-		doc.drawString(g, x, y, baseY, fontItem.getFontName() + ": " + fontItem.getSize());
 	}
 	
 	/* here cannot use begStat, but just pageStat is valid */

@@ -220,20 +220,18 @@ public class Segment implements Element {
 		}
 	}
 	
-	public int h(int col) {
-		int h = 0;
-		int pos = 0;
+	public Attribute getItem(int col) {
+		DocSegment.Cursor cursor = null;
+		Attribute attr = null;
 		
-		for (SegmentLine s: m_lines) {
-			if (col <= s.begCol() + s.length()) {
-				pos = col - s.begCol();
-				
-				h = s.h(pos);
-				break;
-			} 
+		cursor = DocSegment.find(m_attrs, col);
+		if (null != cursor) {
+			attr = (Attribute)cursor.m_pilot.data();
+			
+			return attr;
+		} else {
+			return null;
 		}
-		
-		return h;
 	}
 	
 	public void findByCol(DocView doc, int col, 

@@ -223,6 +223,14 @@ public class DocSegment {
 			}
 		}
 		
+		if (0 < len) {
+			attr = creatAttr(doc, data, off, off + len, itr.ids());
+			attrs.push_back(attr);
+			
+			off += len;
+			len = 0;
+		}
+		
 		while (slices.end() != node) {
 			data = node.data();
 			node = node.next();
@@ -234,12 +242,18 @@ public class DocSegment {
 		return attrs;
 	}
 	
+	public static void getAttrDim(DocView doc, Attribute attr, DimenCb dc) {
+		dc.reset();
+		dc.setRange(0, attr.length());
+		attr.calcDim(dc);
+	}
+	
 	public static ListRoot<SegmentLine> attrs2Line(
 			Segment segment,
 			DocView doc, int maxW,
 			ListRoot<Attribute> attrs) {
 		PosInfo posInfo = new PosInfo();
-		DimenCb ds = new DimenCb(doc);
+		DimenCb dc = new DimenCb(doc);
 		ListRoot<SegmentLine> lines = null;
 		SegmentLine line = null;
 		ViewEx view = null;
@@ -255,19 +269,17 @@ public class DocSegment {
 		
 		w = maxW;
 		for (Attribute attr: attrs) { 
-			ds.reset();
-			ds.setRange(0, attr.length());
-			attr.calcDim(ds);
+			getAttrDim(doc, attr, dc);
 			
 			off = 0;
 			len = attr.length();
-			leftW = ds.m_retW;
+			leftW = dc.m_retW;
 			
 			while (0 < len) {
 				if (leftW <= w) {
 					view = attr.creat(off, off + len,
-							leftW, ds.m_retH, 
-							ds.m_retBaseY);
+							leftW, dc.m_retH, 
+							dc.m_retBaseY);
 					line.addView(view);
 					
 					col += len;
@@ -279,8 +291,8 @@ public class DocSegment {
 					w = maxW;
 					
 					view = attr.creat(off, off + len,
-							leftW, ds.m_retH, 
-							ds.m_retBaseY);
+							leftW, dc.m_retH, 
+							dc.m_retBaseY);
 					line.addView(view);
 					
 					col += len;
@@ -291,8 +303,8 @@ public class DocSegment {
 					
 					if (0 < posInfo.pos()) {
 						view = attr.creat(off, off + posInfo.pos(),
-								posInfo.x(), ds.m_retH, 
-								ds.m_retBaseY);
+								posInfo.x(), dc.m_retH, 
+								dc.m_retBaseY);
 						line.addView(view);
 						
 						col += posInfo.pos();

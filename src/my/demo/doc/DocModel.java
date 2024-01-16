@@ -3,6 +3,7 @@ package my.demo.doc;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -607,44 +608,87 @@ class DocModel {
 		return attrs;
 	}
 	
-	int getH(Axis axis) { 
+	Attribute getItem(Axis axis) { 
 		Segment segment = null;
 		
 		segment = getSegment(axis.row());
-		return segment.h(axis.col());
+		return segment.getItem(axis.col());
 	}
 	
-	public void drawPosInfo(DocView doc, Graphics g, 
-			int w, int h, PageState begStat, 
-			PageState pageStat, PosInfo posInfo,
-			Axis axis) {
+	public void drawPosInfo(DocView doc, Graphics g, int w, int h) {
+		PageState begStat = m_state.begStat();
+		PageState pageStat = m_state.pageStat();
+		PosInfo posInfo = m_state.posInfo();
+		Axis axis = m_state.curr();
+		DimenCb dc = new DimenCb(doc);
+		Segment segment = null;
+		Attribute attr = null;
 		SegmentLine segline = null;
-		int posH = 0;
+		int offH = 0;
 		int x = 0;
 		int y = 0;
 		
 		y = m_pages.rangeH(begStat, pageStat);
 		if (0 <= y) {
+			x = w + posInfo.x();
+			
+			segment = getSegment(axis.row());
 			segline = m_pages.getLine(pageStat);
 			
-			posH = getH(axis);
-			
-			x = w + posInfo.x();
-			y += segline.h() - posH;
-			
-			doc.drawLine( g, x, y, x, y + posH);
+			if (!segment.isEmpty()) {
+				attr = segment.getItem(axis.col());
+				DocSegment.getAttrDim(doc, attr, dc);
+				
+				if (!dc.isValid()) { 
+					offH = segline.h() - segline.textH();
+					y += offH + segline.baseY() - dc.m_retBaseY;
+					doc.drawLine( g, x, y, x, y + dc.m_retH);
+				} else {
+					offH = segline.h() - dc.m_retH;
+					doc.drawLine( g, x, y+offH, x, y + segline.h());
+				}
+			} else {
+				doc.drawLine( g, x, y, x, y + segline.h());
+			}
 		}
 	}
 	
-	public void renderStatus(Graphics g, int w, int h) {
-		PageState begStat = m_state.begStat();
+	public void renderStatus(DocView doc, Graphics g, int w, int h) {
 		PageState pageStat = m_state.pageStat();
-		PosInfo info = m_state.posInfo();
+		PosInfo posInfo = m_state.posInfo();
+		int statusFont = doc.statusFont();
+		int statusColor = doc.statusColor(); 
 		Axis axis = m_state.curr();
-		int[] attrs = getAttr(axis);
- 
-		m_pages.renderStatus(m_doc, g, w, h, pageStat, info, attrs); 
-		drawPosInfo(m_doc, g, w, h, begStat, pageStat, info, axis);
+		int maxH = doc.pageH();
+		int baseY = doc.statusBaseY();
+		FontMetrics statusFm = doc.getFM(statusFont);
+		int[] attrs = null;
+		int x = 0;
+		int y = maxH;
+		
+		attrs = getAttr(axis);
+		
+		doc.setFont(g, statusFont);
+		doc.setBackColor(g, attrs[EnumAttr.ATTR_BACK_COLOR.ordinal()]);
+		doc.clearRect(g, x, y, w, h);
+		
+		doc.setForeColor(g, attrs[EnumAttr.ATTR_FORE_COLOR.ordinal()]);
+		doc.fillArc(g, x, y, w, h, -90, 180); 
+		
+		doc.setForeColor(g, statusColor);
+		doc.drawLine(g, w, 0, w, doc.height());
+		doc.drawLine(g, 0, y, doc.width(), y);
+		x += w * 2;
+		
+		String info = "page: " + Integer.toString(pageStat.pageNo()) 
+			+ ", line: " + Integer.toString(pageStat.pageLine()) 
+			+ ", col: " + Integer.toString(posInfo.pos());
+
+		doc.drawString(g, x, y, baseY, info); 
+		x += statusFm.stringWidth(info) + w;
+		
+		FontItem fontItem = doc.fontItem(attrs[EnumAttr.ATTR_FONT.ordinal()]);
+		doc.drawString(g, x, y, baseY, fontItem.getFontName() + ": " + fontItem.getSize());
 	}
 	
 	public void render(Graphics g) {
@@ -655,7 +699,8 @@ class DocModel {
 		
 		drawPages(g, w, h);
 		fillArea(g, w, h);
-		renderStatus(g, w, h);
+		renderStatus(m_doc, g, w, h);
+		drawPosInfo(m_doc, g, w, h);
 	}
 	
 	public void disp() {

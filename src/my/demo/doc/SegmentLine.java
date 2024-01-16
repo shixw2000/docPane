@@ -54,7 +54,6 @@ class Attribute implements Element {
 			Cache cache = cb.cache();
 			
 			cb.m_retW = doc.widthCache(cache, fm);
-			cb.setValid(true);
 		}
 	}
 	
@@ -69,7 +68,6 @@ class Attribute implements Element {
 			cb.m_retW = doc.widthCache(cache, fm);
 			cb.m_retH = fm.getHeight();
 			cb.m_retBaseY = fm.getAscent();
-			cb.setValid(true);
 		}
 	}
 	
@@ -136,7 +134,6 @@ class ViewEx extends Attribute {
 	public void calcW(WidthCb cb) {
 		if (isAll(cb)) {
 			cb.m_retW = w();
-			cb.setValid(true);
 		} else {
 			super.calcW(cb);
 		}
@@ -172,7 +169,6 @@ class ViewEx extends Attribute {
 			}
 			
 			doc.drawCache(g, cb.m_x, cb.m_y+off, cb.m_baseY, cache); 
-			cb.setValid(true);
 		}
 	}
 	
@@ -182,7 +178,7 @@ class ViewEx extends Attribute {
 		if (!cb.isValid()) {
 			DocView doc = cb.m_doc;
 			Graphics g = cb.m_g;
-			int off = cb.m_h - cb.m_textH;
+			int off = (cb.m_h - cb.m_textH) + (cb.m_baseY - m_baseY);
 			
 			if (isAll(cb)) {
 				cb.m_retW = w();
@@ -193,8 +189,7 @@ class ViewEx extends Attribute {
 				cb.m_retW = doc.widthCache(cache, fm);
 			}
 			
-			doc.fillRect(g, cb.m_x, cb.m_y+off, cb.m_retW, cb.m_textH);
-			cb.setValid(true);
+			doc.fillRect(g, cb.m_x, cb.m_y+off, cb.m_retW, m_h);
 		}
 	}
 }
@@ -352,24 +347,6 @@ public class SegmentLine implements Element {
 		}
 
 		posInfo.setPosX(cnt, x); 
-	}
-	
-	public int h(int pos) {
-		ViewEx ve = null;
-		
-		if (!m_views.isEmpty() && 0 <= pos && pos <= m_cnt) {
-			DocSegment.Cursor cursor = null;
-			
-			cursor = DocSegment.find(m_views, pos);
-			ve = (ViewEx)cursor.m_pilot.data();
-			if (SLICE_TYPE.IMAGE_SLICE != ve.type()) { 
-				return m_textH - (m_baseY - ve.baseY());
-			} else {
-				return ve.h();
-			}
-		} else { 
-			return m_textH;
-		}
 	}
 	
 	public void draw(int beg, int end, WidthCb wc, DrawLineCb dlc) {

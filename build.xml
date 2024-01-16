@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<project name="docPane" default="default" basedir=".">
+  <property file="${basedir}/build.properties"/>
+
+  <tstamp>
+    <format property="current.year" pattern="yyyy"/>
+    <format property="DSTAMP" pattern="yyyy-MM-dd"/>
+    <format property="TSTAMP" pattern="HH:mm:ss"/>
+  </tstamp>
+
+  <property name="name" value="docPane"/>
+  <property name="version" value="1.0"/>
+  <property name="year" value="2000-${current.year}"/>
+  <property name="final.name" value="${name}-${version}"/>
+  <property name="javac.deprecation" value="on"/>
+  <property name="javac.debug" value="off"/>
+  <property name="build.encoding" value="utf-8"/>
+
+  <property name="build.dir" location="build"/>
+
+  <!-- Build classpath -->
+  <path id="classpath">
+    <pathelement location="${build.dir}/classes/java"/>
+  </path>
+
+  <!-- ================================================================== -->
+  <!-- Prepares the build directory                                       -->
+  <!-- ================================================================== -->
+  <target name="init">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- C O M P I L E                                                      -->
+  <!-- ================================================================== -->
+  <!--                                                                    -->
+  <!-- ================================================================== -->
+  <target name="compile" depends="compile-core"/>
+  <target name="compile-core" depends="init"
+    description="Compiles core classes">
+    <mkdir dir="${build.dir}/classes/java"/>
+    <javac
+      encoding="${build.encoding}"
+      srcdir="src"
+      includes="my/demo/doc/*.java"
+      destdir="${build.dir}/classes/java"
+      deprecation="${javac.deprecation}"
+      debug="${javac.debug}">
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- J A R                                                              -->
+  <!-- ================================================================== -->
+  <!--                                                                    -->
+  <!-- ================================================================== -->
+  <target name="jar" depends="jar-core"/>
+  <target name="jar-core" depends="compile-core"
+    description="Generates the Jar file">
+    <jar
+      destfile="${build.dir}/${final.name}.jar"
+      basedir="${build.dir}/classes/java"
+      excludes="**/*.java">
+      <manifest>
+        <attribute name="Main-Class" value="my.demo.doc.MyCanvas"/>
+        <attribute name="Created-By" value="shixw_2000"/>
+        <attribute name="Sealed" value="false"/>
+        <section name="my/demo/doc/">
+          <attribute name="Specification-Title" value="rich word processor"/>
+          <attribute name="Specification-Version" value="${version}"/>
+          <attribute name="Specification-Vendor" value="Individual"/>
+          <attribute name="Implementation-Title" value="shixw_2000"/>
+          <attribute name="Implementation-Version" value="build ${DSTAMP} ${TSTAMP}"/>
+          <attribute name="Implementation-Vemdpr" value="open source"/>
+        </section>
+      </manifest>
+    </jar>
+  </target>
+ 
+  <!-- ================================================================== -->
+  <!-- C L E A N                                                          -->
+  <!-- ================================================================== -->
+  <!--                                                                    -->
+  <!-- ================================================================== -->
+  <target name="clean"
+    description="Removes contents of build and dist directories">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <target name="default" depends="jar-core"/>
+
+</project>
