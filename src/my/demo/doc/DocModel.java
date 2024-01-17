@@ -420,7 +420,7 @@ class DocModel {
 		int usedH = m_state.usedH();
 		int w = m_doc.statusW();
 		
-		System.out.printf("====seek| x=%d| y=%d|\n", x, y);
+//		System.out.printf("====seek| x=%d| y=%d|\n", x, y);
 		x -= w;
 		
 		findByXY(maxW, usedH, m_state.begStat(), x, y,
@@ -437,7 +437,7 @@ class DocModel {
 		int usedH = m_state.usedH();
 		int w = m_doc.statusW();
 		
-		System.out.printf("====drag| x=%d| y=%d|\n", x, y);
+//		System.out.printf("====drag| x=%d| y=%d|\n", x, y);
 		
 		x -= w;
 		findByXY(maxW, usedH, m_state.begStat(), x, y,
@@ -704,6 +704,7 @@ class DocModel {
 	}
 	
 	public void disp() {
+		boolean isPrint = false;
 		int maxH = m_doc.pageH();
 		int usedH = m_state.usedH();
 		Axis old_axis = m_state.last();
@@ -712,14 +713,16 @@ class DocModel {
 		PageState stat = m_state.pageStat();
 		PosInfo info = m_state.posInfo();
 		
-		System.out.printf("h=(%d, %d)| old_axis=(%d, %d)|" +
-				"axis=(%d, %d)| beg=(%d, %d)| stat=(%d, %d)| pos=(%d, %d)|\n", 
-				maxH, usedH, 
-				old_axis.row(), old_axis.col(),
-				axis.row(), axis.col(),
-				beg.pageNo(), beg.pageLine(),
-				stat.pageNo(), stat.pageLine(),
-				info.pos(), info.x());
+		if (isPrint) {
+			System.out.printf("h=(%d, %d)| old_axis=(%d, %d)|" +
+					"axis=(%d, %d)| beg=(%d, %d)| stat=(%d, %d)| pos=(%d, %d)|\n", 
+					maxH, usedH, 
+					old_axis.row(), old_axis.col(),
+					axis.row(), axis.col(),
+					beg.pageNo(), beg.pageLine(),
+					stat.pageNo(), stat.pageLine(),
+					info.pos(), info.x());
+		}
 	}
 }
 

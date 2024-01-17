@@ -24,8 +24,6 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import javafx.stage.FileChooser;
-
 public class MyCanvas {
 	private String m_cwd;
 	DocPane pane = new DocPane();
